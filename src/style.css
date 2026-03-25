@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --white-color: #ffffff;
+  --yellow-color: #ffcd00;
+  --blue-color: #003087;
+  --red-color: #c8102e;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+}
+
+html {
+}
+
+#app {
+  @apply h-screen w-screen overflow-hidden;
+}
+
+img {
+  filter: none;
+  opacity: 1;
+}
