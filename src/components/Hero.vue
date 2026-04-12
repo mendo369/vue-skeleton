@@ -25,7 +25,7 @@ const showContent = ref(false);
         />
       </div>
       <div
-        class="text-4xl md:text-[5em] leading-tight text-center font-bold mb-8"
+        class="text-4xl md:text-[5em] leading-tight text-center font-bold mb-8 text-shadow"
       >
         <Typewriter
           :words="['Escala sin caos. Vende sin límites.']"
@@ -41,7 +41,7 @@ const showContent = ref(false);
           showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         "
       >
-        <p class="text-xl">
+        <p class="text-xl text-shadow">
           Transformamos tu operación de e-commerce con IA y automatización.
           Convierte clicks en clientes.
         </p>
@@ -53,17 +53,17 @@ const showContent = ref(false);
         "
       >
         <div
-          class="flex gap-5 items-center bg-white px-8 py-4 rounded-full hover:bg-black/90 cursor-pointer transition-all shadow-lg hover:shadow-black/20"
+          class="flex gap-5 items-center bg-white px-8 py-4 rounded-full cursor-pointer transition-all shadow-lg hover:shadow-black/20"
         >
           <div class="text-black text-lg flex gap-2 items-center font-medium">
             <CalendarClock /> Agendar Consultoría
           </div>
         </div>
         <div
-          class="flex gap-5 items-center bg-transparent px-8 py-4 rounded-full border-white border hover:bg-main-gray/5 cursor-pointer transition-all"
+          class="flex gap-5 items-center bg-white/[0.005] backdrop-blur-md border border-white/20 px-8 py-4 rounded-full cursor-pointer transition-all hover:bg-white/20 hover:border-white/5 shadow-xl"
         >
           <div class="text-white text-lg flex gap-2 items-center font-medium">
-            <ToolCase></ToolCase> Casos de Uso
+            <ToolCase /> Casos de Uso
           </div>
         </div>
       </div>
@@ -71,4 +71,8 @@ const showContent = ref(false);
   </ParticleCursorFollow>
 </template>
 
-<style></style>
+<style scoped>
+.text-shadow {
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+</style>

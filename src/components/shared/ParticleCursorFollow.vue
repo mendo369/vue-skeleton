@@ -1,153 +1,191 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, type Ref } from "vue";
 
-interface Particle {
-  baseX: number;
-  baseY: number;
+interface Particle3D {
   x: number;
   y: number;
-  vx: number;
-  vy: number;
-  angle: number;
+  z: number;
+  baseX: number;
+  baseY: number;
+  baseZ: number;
+  projectedX: number;
+  projectedY: number;
   size: number;
-  hueShift: number;
-  waveOffset: number;
+  opacity: number;
+  hue: number;
 }
 
 interface MousePosition {
   x: number;
   y: number;
+  isActive: boolean;
 }
 
 interface Props {
   particleCount?: number;
   particleSize?: number;
-  attractionRadius?: number;
-  waveAmplitude?: number;
-  waveSpeed?: number;
-  hueSpeed?: number;
-  friction?: number;
-  ease?: number;
+  sphereRadius?: number;
+  rotationSpeed?: number;
+  mouseInfluence?: number;
+  perspective?: number;
+  breathingSpeed?: number;
+  breathingAmplitude?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  particleCount: 220,
-  particleSize: 2,
-  attractionRadius: 130,
-  waveAmplitude: 28,
-  waveSpeed: 0.018,
-  hueSpeed: 0.25,
-  friction: 0.93,
-  ease: 0.04,
+  particleCount: 800,
+  particleSize: 1.8,
+  sphereRadius: 220,
+  rotationSpeed: 0.002,
+  mouseInfluence: 0.0005,
+  perspective: 1000,
+  breathingSpeed: 0.0015,
+  breathingAmplitude: 0.15, // 15% de expansión
 });
 
 const canvasRef: Ref<HTMLCanvasElement | null> = ref(null);
 const ctxRef: Ref<CanvasRenderingContext2D | null> = ref(null);
-const particles: Ref<Particle[]> = ref([]);
-const mouse: Ref<MousePosition> = ref({ x: -9999, y: -9999 });
+const particles: Ref<Particle3D[]> = ref([]);
+const mouse: Ref<MousePosition> = ref({ x: 0, y: 0, isActive: false });
 const animationFrameId: Ref<number | null> = ref(null);
+
+let rotationX = 0;
+let rotationY = 0;
+let targetRotationX = 0;
+let targetRotationY = 0;
+let centerX = 0;
+let centerY = 0;
 let time = 0;
-let hueBase = 0;
+
+const colorPalette = [
+  { h: 220, s: 85, l: 65 },
+  { h: 240, s: 80, l: 60 },
+  { h: 260, s: 75, l: 65 },
+  { h: 280, s: 85, l: 70 },
+  { h: 210, s: 90, l: 60 },
+];
+
+function fibonacciSphere(
+  count: number,
+  radius: number,
+): { x: number; y: number; z: number }[] {
+  const points: { x: number; y: number; z: number }[] = [];
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+
+  for (let i = 0; i < count; i++) {
+    const y = 1 - (i / (count - 1)) * 2;
+    const radiusAtY = Math.sqrt(1 - y * y);
+    const theta = goldenAngle * i;
+
+    const x = Math.cos(theta) * radiusAtY;
+    const z = Math.sin(theta) * radiusAtY;
+
+    points.push({
+      x: x * radius,
+      y: y * radius,
+      z: z * radius,
+    });
+  }
+  return points;
+}
 
 function initParticles(): void {
   if (!canvasRef.value) return;
   const { width, height } = canvasRef.value;
+  centerX = width / 2;
+  centerY = height / 2;
 
-  particles.value = Array.from(
-    { length: props.particleCount },
-    (): Particle => {
-      const x = Math.random() * width;
-      const y = Math.random() * height;
-      return {
-        baseX: x,
-        baseY: y,
-        x,
-        y,
-        vx: 0,
-        vy: 0,
-        angle: 0,
-        size: props.particleSize * (0.75 + Math.random()),
-        hueShift: Math.random() * 60 - 30,
-        waveOffset: Math.random() * 1000,
-      };
-    },
-  );
-}
+  particles.value = [];
+  const spherePoints = fibonacciSphere(props.particleCount, props.sphereRadius);
 
-function updateParticles(): void {
-  if (!canvasRef.value) return;
-  const { width, height } = canvasRef.value;
-  time += props.waveSpeed;
-  hueBase = (hueBase + props.hueSpeed) % 360;
-
-  particles.value.forEach((p) => {
-    const waveX = Math.sin(time + p.waveOffset * 0.09) * props.waveAmplitude;
-    const waveY =
-      Math.cos(time * 0.75 + p.waveOffset * 0.18) * props.waveAmplitude;
-
-    const targetX = p.baseX + waveX;
-    const targetY = p.baseY + waveY;
-
-    const dx = mouse.value.x - p.x;
-    const dy = mouse.value.y - p.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-
-    if (dist < props.attractionRadius) {
-      const force = (props.attractionRadius - dist) / props.attractionRadius;
-      p.vx += dx * force * 0.018;
-      p.vy += dy * force * 0.018;
-    }
-
-    p.vx += (targetX - p.x) * props.ease;
-    p.vy += (targetY - p.y) * props.ease;
-    p.vx *= props.friction;
-    p.vy *= props.friction;
-
-    p.x += p.vx;
-    p.y += p.vy;
-
-    p.angle = Math.atan2(p.vy, p.vx) + Math.PI / 4;
-
-    if (p.x < -60) {
-      p.x = p.baseX = width + 60;
-    }
-    if (p.x > width + 60) {
-      p.x = p.baseX = -60;
-    }
-    if (p.y < -60) {
-      p.y = p.baseY = height + 60;
-    }
-    if (p.y > height + 60) {
-      p.y = p.baseY = -60;
-    }
+  spherePoints.forEach((point) => {
+    const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+    particles.value.push({
+      x: point.x,
+      y: point.y,
+      z: point.z,
+      baseX: point.x,
+      baseY: point.y,
+      baseZ: point.z,
+      projectedX: 0,
+      projectedY: 0,
+      size: props.particleSize * (0.8 + Math.random() * 1.5),
+      opacity: 0.4 + Math.random() * 0.4,
+      hue: (color.h + (Math.random() - 0.5) * 20 + 360) % 360,
+    });
   });
 }
 
-function draw(): void {
+function rotatePoint(
+  x: number,
+  y: number,
+  z: number,
+  rotX: number,
+  rotY: number,
+) {
+  // Y-axis rotation
+  let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
+  let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
+  // X-axis rotation
+  let y2 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+  let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+  return { x: x1, y: y2, z: z2 };
+}
+
+function updateAndDraw(): void {
   const ctx = ctxRef.value;
   if (!ctx || !canvasRef.value) return;
   const { width, height } = canvasRef.value;
 
   ctx.clearRect(0, 0, width, height);
 
-  particles.value.forEach((p) => {
-    const hue = (hueBase + p.hueShift + 360) % 360;
+  time += props.breathingSpeed;
+  // Factor de escala de respiración (1.0 +/- amplitud)
+  const breathScale = 1 + Math.sin(time) * props.breathingAmplitude;
 
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.angle);
+  targetRotationY += props.rotationSpeed;
+  if (mouse.value.isActive) {
+    targetRotationY +=
+      ((mouse.value.x - centerX) / width) * props.mouseInfluence * 50;
+    targetRotationX +=
+      ((mouse.value.y - centerY) / height) * props.mouseInfluence * 25;
+  }
+
+  rotationX += (targetRotationX - rotationX) * 0.05;
+  rotationY += (targetRotationY - rotationY) * 0.05;
+  rotationX = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, rotationX));
+
+  const sorted = particles.value
+    .map((p) => {
+      // Aplicamos la escala de respiración antes de rotar
+      const bx = p.baseX * breathScale;
+      const by = p.baseY * breathScale;
+      const bz = p.baseZ * breathScale;
+
+      const rot = rotatePoint(bx, by, bz, rotationX, rotationY);
+      const scale = props.perspective / (props.perspective + rot.z);
+
+      return {
+        px: rot.x * scale + centerX,
+        py: rot.y * scale + centerY,
+        scale,
+        z: rot.z,
+        hue: p.hue,
+        opacity: p.opacity,
+        size: p.size,
+      };
+    })
+    .sort((a, b) => b.z - a.z); // Dibujamos de atrás hacia adelante
+
+  sorted.forEach((p) => {
+    const depthFactor = (p.scale - 0.5) * 2;
     ctx.beginPath();
-    ctx.moveTo(-p.size, 0);
-    ctx.lineTo(p.size, 0);
-    ctx.lineWidth = p.size * 0.55;
-    ctx.strokeStyle = `hsla(${hue}, 85%, 55%, 0.75)`;
-    ctx.lineCap = "round";
-    ctx.stroke();
-    ctx.restore();
+    ctx.arc(p.px, p.py, Math.max(0.3, p.size * p.scale), 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${p.hue}, 80%, 65%, ${p.opacity * (0.2 + depthFactor * 0.8)})`;
+    ctx.fill();
   });
 
-  updateParticles();
-  animationFrameId.value = requestAnimationFrame(draw);
+  animationFrameId.value = requestAnimationFrame(updateAndDraw);
 }
 
 function handleMouseMove(e: MouseEvent): void {
@@ -155,16 +193,12 @@ function handleMouseMove(e: MouseEvent): void {
   const rect = canvasRef.value.getBoundingClientRect();
   mouse.value.x = e.clientX - rect.left;
   mouse.value.y = e.clientY - rect.top;
-}
-
-function handleMouseLeave(): void {
-  mouse.value.x = -9999;
-  mouse.value.y = -9999;
+  mouse.value.isActive = true;
 }
 
 onMounted(() => {
-  if (!canvasRef.value) return;
   const canvas = canvasRef.value;
+  if (!canvas) return;
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   ctxRef.value = ctx;
@@ -172,20 +206,21 @@ onMounted(() => {
   const resize = () => {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
+    centerX = canvas.width / 2;
+    centerY = canvas.height / 2;
     initParticles();
   };
 
   resize();
   window.addEventListener("resize", resize);
-  canvas.addEventListener("mousemove", handleMouseMove);
-  canvas.addEventListener("mouseleave", handleMouseLeave);
+  window.addEventListener("mousemove", handleMouseMove);
+  canvas.addEventListener("mouseleave", () => (mouse.value.isActive = false));
 
-  draw();
+  updateAndDraw();
 
   onUnmounted(() => {
     window.removeEventListener("resize", resize);
-    canvas.removeEventListener("mousemove", handleMouseMove);
-    canvas.removeEventListener("mouseleave", handleMouseLeave);
+    window.removeEventListener("mousemove", handleMouseMove);
     if (animationFrameId.value) cancelAnimationFrame(animationFrameId.value);
   });
 });
@@ -206,6 +241,7 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  /* background: transparent; */
 }
 
 .particle-canvas {
@@ -214,7 +250,7 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: all;
+  pointer-events: none;
 }
 
 .content {
@@ -222,6 +258,5 @@ onMounted(() => {
   z-index: 1;
   width: 100%;
   height: 100%;
-  pointer-events: none;
 }
 </style>
