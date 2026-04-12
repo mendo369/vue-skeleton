@@ -41,7 +41,7 @@ function prev() {
 </script>
 
 <template>
-  <section class="team-section w-3/4 mx-auto">
+  <section class="team-section w-full md:w-3/4 mx-auto">
     <div class="team-header">
       <h2 class="team-title">{{ sectionTitle }}</h2>
       <p class="team-desc">{{ sectionDescription }}</p>

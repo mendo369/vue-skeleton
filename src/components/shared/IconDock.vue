@@ -55,46 +55,63 @@ onUnmounted(() => {
       :key="item.id"
       class="dock-item hover:bg-main-purple hover:text-white"
       :style="{
-        width: `${itemSize}px`,
-        height: `${itemSize}px`,
         transform: `translateY(${translateYs[i] ?? 0}px)`,
       }"
       :aria-label="item.label"
       @click="item.onClick?.()"
     >
-      <component :is="item.icon" :size="iconSize" :stroke-width="1.5" />
+      <component :is="item.icon" class="icon" :stroke-width="1.5" />
     </button>
   </div>
 </template>
 
 <style scoped>
 .dock {
+  --size: 82px;
+  --icon: 28px;
+  --gap: 12px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: var(--gap);
   padding: 32px 20px;
   overflow: visible;
 }
 
+@media (max-width: 640px) {
+  .dock {
+    --size: 42px;
+    --icon: 22px;
+    --gap: 8px;
+    padding: 24px 10px;
+  }
+}
+
 .dock-item {
+  width: var(--size);
+  height: var(--size);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: #000;
-  /* background: #f0f0f0; */
   border: none;
   cursor: pointer;
   flex-shrink: 0;
   will-change: transform;
-  transition: background 0.15s;
+  transition: all 0.2s ease;
   color: #fff;
-  /* color: #111; */
+}
+
+.icon {
+  width: var(--icon);
+  height: var(--icon);
 }
 
 .dock-item:hover {
-  background: var(--main-purple);
+  background: #801586;
   color: white;
+  transform: scale(1.1) translateY(-5px) !important;
 }
 </style>
