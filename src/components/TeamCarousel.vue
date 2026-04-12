@@ -338,5 +338,9 @@ function prev() {
   .info-content-stable {
     min-height: 140px;
   }
+
+  .card-label {
+    font-size: 16px;
+  }
 }
 </style>
