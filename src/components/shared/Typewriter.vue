@@ -16,10 +16,10 @@ const props = withDefaults(defineProps<Props>(), {
   deletingSpeed: 100,
   pauseDuration: 2000,
   loop: true,
-  blinkSpeed: "0.8s",
+  blinkSpeed: "0.75s",
 });
 
-const emit = defineEmits(['on-finished']);
+const emit = defineEmits(["on-finished"]);
 
 const displayText = ref("");
 const wordIndex = ref(0);
@@ -44,10 +44,9 @@ function type() {
   let nextSpeed = isDeleting.value ? props.deletingSpeed : props.typingSpeed;
 
   if (!isDeleting.value && charIndex.value === currentWord.length) {
-    // If it's the last word and loop is false, stop here
     if (!props.loop && wordIndex.value === props.words.length - 1) {
       isFinished.value = true;
-      emit('on-finished');
+      emit("on-finished");
       return;
     }
     nextSpeed = props.pauseDuration;
@@ -61,27 +60,38 @@ function type() {
   timeoutId = window.setTimeout(type, nextSpeed);
 }
 
-onMounted(() => {
-  type();
-});
-
+onMounted(() => type());
 onUnmounted(() => {
   if (timeoutId) clearTimeout(timeoutId);
 });
 </script>
 
 <template>
-  <div class="inline-flex items-center gap-1">
-    <span class="text-inherit">{{ displayText }}</span>
-    <span
-      class="w-3 h-3 bg-purple-600 rounded-full animate-cursor shadow-[0_0_10px_rgba(147,51,234,0.5)]"
-      :style="{ animationDuration: props.blinkSpeed }"
-    ></span>
-  </div>
+  <span class="typewriter">
+    {{ displayText
+    }}<span class="cursor" :style="{ animationDuration: blinkSpeed }"></span>
+  </span>
 </template>
 
 <style scoped>
-@keyframes pulse-fast {
+.typewriter {
+  display: inline;
+}
+
+.cursor {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: #9333ea;
+  border-radius: 50%;
+  margin-left: 4px;
+  vertical-align: middle;
+  box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+  animation: pulse-cursor var(--blink-speed, 0.75s) cubic-bezier(0.4, 0, 0.6, 1)
+    infinite;
+}
+
+@keyframes pulse-cursor {
   0%,
   100% {
     opacity: 1;
@@ -91,10 +101,5 @@ onUnmounted(() => {
     opacity: 0.3;
     transform: scale(0.8);
   }
-}
-
-.animate-cursor {
-  animation: pulse-fast var(--blink-speed, 0.8s) cubic-bezier(0.4, 0, 0.6, 1)
-    infinite;
 }
 </style>

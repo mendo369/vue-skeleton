@@ -5,10 +5,8 @@
 @tailwind utilities;
 
 :root {
-  --white-color: #ffffff;
-  --yellow-color: #ffcd00;
-  --blue-color: #003087;
-  --red-color: #c8102e;
+  --main-purple: #801586;
+  --main-gray: #45474D;
 }
 
 * {

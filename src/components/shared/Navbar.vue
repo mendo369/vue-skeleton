@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Boxes, User2 } from "lucide-vue-next";
+import { Boxes } from "lucide-vue-next";
 </script>
 
 <template>

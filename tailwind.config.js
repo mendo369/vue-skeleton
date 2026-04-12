@@ -9,6 +9,8 @@ export default {
       colors: {
         main: {
           gray: '#45474D',
+          purple: '#801586',
+          
         }
       }
     },
