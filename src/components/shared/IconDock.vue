@@ -76,7 +76,8 @@ onUnmounted(() => {
   justify-content: center;
   gap: var(--gap);
   padding: 32px 20px;
-  overflow: visible;
+  overflow: hidden;
+  max-width: 100dvw;
 }
 
 @media (max-width: 640px) {

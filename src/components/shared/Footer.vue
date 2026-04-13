@@ -1,24 +1,4 @@
-<script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-
-const router = useRouter();
-
-const links = [
-  { label: "Inicio", path: "/" },
-  { label: "Servicios", path: "/services" },
-  { label: "Sobre nosotros", path: "/about" },
-  { label: "Contacto", path: "/contact" },
-];
-
-const social = [
-  { name: "Instagram", icon: "📸", url: "#" },
-  { name: "TikTok", icon: "🎵", url: "#" },
-  { name: "LinkedIn", icon: "👔", url: "#" },
-];
-
-const currentYear = new Date().getFullYear();
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <footer class="footer flex flex-col items-center justify-center my-10">
