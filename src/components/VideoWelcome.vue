@@ -7,7 +7,7 @@
     >
       <iframe
         class="w-full h-full"
-        src="https://www.youtube.com/embed/SVCBA-pBgt0"
+        src=""
         title="YouTube video player"
         frameborder="0"
         allow="
@@ -24,7 +24,7 @@
     </div>
     <div class="mt-12 text-center">
       <h2 class="text-3xl font-bold text-main-gray mb-4">
-        Descubre cómo Simetri-K impulsa tu negocio
+        Descubre cómo Simetrik impulsa tu negocio
       </h2>
       <p class="text-lg text-main-gray/70 max-w-xl">
         Mira nuestro video de bienvenida y conoce las herramientas que

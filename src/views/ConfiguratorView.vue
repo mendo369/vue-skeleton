@@ -104,14 +104,16 @@ const onDragStart = (item: any) => {
   draggedItem.value = item;
 };
 
+const addAddon = (item: any) => {
+  if (!selectedAddons.value.find((a) => a.id === item.id)) {
+    selectedAddons.value.push(item);
+    addons.value = addons.value.filter((a) => a.id !== item.id);
+  }
+};
+
 const onDrop = () => {
-  if (
-    draggedItem.value &&
-    !selectedAddons.value.find((a) => a.id === draggedItem.value.id)
-  ) {
-    selectedAddons.value.push(draggedItem.value);
-    // Remove from available
-    addons.value = addons.value.filter((a) => a.id !== draggedItem.value.id);
+  if (draggedItem.value) {
+    addAddon(draggedItem.value);
   }
   isHoveringPlan.value = false;
   draggedItem.value = null;
@@ -144,9 +146,7 @@ onMounted(() => {
           Volver al inicio
         </router-link>
 
-        <h1
-          class="text-4xl md:text-6xl font-black tracking-tighter text-zinc-900 mb-4"
-        >
+        <h1 class="text-4xl md:text-6xl font-black text-zinc-900 mb-4">
           Configura tu Plan {{ basePlan.name }}
         </h1>
         <p class="text-zinc-500 text-lg max-w-2xl">
@@ -193,7 +193,7 @@ onMounted(() => {
                     {{ addon.name }}
                   </h3>
                   <span
-                    class="text-[10px] font-bold text-purple-600 uppercase"
+                    class="text-[10px] font-bold text-main-purple uppercase"
                     >{{ addon.category }}</span
                   >
                 </div>
@@ -202,12 +202,20 @@ onMounted(() => {
                 {{ addon.description }}
               </p>
 
-              <!-- Drag Indicator -->
+              <!-- Drag Indicator (Desktop Only) -->
               <div
-                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block"
               >
                 <MousePointer2 class="w-4 h-4 text-purple-400 animate-bounce" />
               </div>
+
+              <!-- Mobile Add Button -->
+              <button
+                @click="addAddon(addon)"
+                class="lg:hidden mt-4 w-full py-3 bg-zinc-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform"
+              >
+                <Plus :size="14" /> Añadir capacidad
+              </button>
             </div>
           </div>
 
@@ -250,16 +258,14 @@ onMounted(() => {
                     class="text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-2 block"
                     >Resumen del Sistema</span
                   >
-                  <h2 class="text-4xl font-black tracking-tighter">
-                    Plan {{ basePlan.name }}
-                  </h2>
+                  <h2 class="text-4xl font-black">Plan {{ basePlan.name }}</h2>
                 </div>
                 <div class="text-right">
                   <p class="text-[10px] font-bold text-zinc-400 uppercase mb-1">
                     Inversión Final Est.
                   </p>
                   <p
-                    class="text-4xl font-bold font-mono tracking-tighter text-zinc-900"
+                    class="text-4xl font-bold font-mono tracking-tighter text-main-purple"
                   >
                     ${{
                       (
@@ -346,7 +352,7 @@ onMounted(() => {
                 </div>
 
                 <button
-                  class="w-full md:w-auto px-10 py-5 bg-zinc-900 text-white rounded-2xl font-bold text-lg hover:bg-purple-700 transition-all shadow-xl shadow-zinc-900/10"
+                  class="w-full md:w-auto px-10 py-5 bg-main-purple text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-zinc-900/10"
                 >
                   Agendar Llamada de Estrategia
                 </button>

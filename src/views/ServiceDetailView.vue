@@ -119,7 +119,7 @@ onMounted(() => {
             <component :is="service.icon" class="w-8 h-8" />
           </div>
           <span
-            class="text-sm font-bold uppercase tracking-widest text-zinc-400"
+            class="text-sm font-bold uppercase tracking-widest text-main-purple"
             >Área de Trabajo</span
           >
         </div>
@@ -152,7 +152,7 @@ onMounted(() => {
                 class="flex gap-4 p-6 rounded-2xl bg-zinc-50 border border-zinc-100 items-start"
               >
                 <div
-                  class="flex-shrink-0 w-8 h-8 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-sm font-bold text-zinc-900"
+                  class="flex-shrink-0 w-8 h-8 rounded-full bg-main-purple border flex items-center justify-center text-sm font-bold text-white"
                 >
                   {{ index + 1 }}
                 </div>
@@ -164,7 +164,7 @@ onMounted(() => {
           <div class="space-y-12">
             <div>
               <h3
-                class="text-sm font-bold uppercase tracking-widest text-zinc-400 mb-4"
+                class="text-sm font-bold uppercase tracking-widest text-main-purple mb-4"
               >
                 ¿Para quién es esto?
               </h3>
@@ -173,9 +173,9 @@ onMounted(() => {
               </p>
             </div>
 
-            <div class="p-8 rounded-3xl bg-zinc-900 text-white">
+            <div class="p-8 rounded-3xl bg-main-purple text-white">
               <h3 class="text-xl font-bold mb-4">Empecemos hoy</h3>
-              <p class="text-zinc-400 text-sm mb-6 leading-relaxed">
+              <p class="text-white text-sm mb-6 leading-relaxed">
                 Integra esta área a tu empresa y comienza a ver resultados en
                 los primeros 10 días.
               </p>
