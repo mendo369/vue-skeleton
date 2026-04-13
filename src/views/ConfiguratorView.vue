@@ -145,7 +145,7 @@ onMounted(() => {
         </router-link>
 
         <h1
-          class="text-4xl md:text-6xl font-black italic tracking-tighter text-zinc-900 mb-4"
+          class="text-4xl md:text-6xl font-black tracking-tighter text-zinc-900 mb-4"
         >
           Configura tu Plan {{ basePlan.name }}
         </h1>
@@ -250,7 +250,7 @@ onMounted(() => {
                     class="text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-2 block"
                     >Resumen del Sistema</span
                   >
-                  <h2 class="text-4xl font-black italic tracking-tighter">
+                  <h2 class="text-4xl font-black tracking-tighter">
                     Plan {{ basePlan.name }}
                   </h2>
                 </div>
