@@ -13,6 +13,12 @@ const routes = [
     component: () => import("../views/PricingView.vue"),
   },
   {
+    path: "/configurar/:plan",
+    name: "Configurator",
+    component: () => import("../views/ConfiguratorView.vue"),
+    props: true,
+  },
+  {
     path: "/servicios/:slug",
     name: "ServiceDetail",
     component: () => import("../views/ServiceDetailView.vue"),

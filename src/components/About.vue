@@ -38,7 +38,7 @@ onMounted(() => {
         if (sectionRef.value) observer?.unobserve(sectionRef.value);
       }
     },
-    { threshold: 0.2 }
+    { threshold: 0.2 },
   );
 
   if (sectionRef.value) {
@@ -113,7 +113,7 @@ const dockItems = [
           'Simetrik transforma tu caos en un sistema que vende solo. \n Campañas + CRM + Automatización. Todo en uno. \n Deja de perseguir clientes. Empieza a cerrar ventas.',
         ]"
         :loop="false"
-        :typing-speed="10"
+        :typing-speed="20"
         :blink-speed="'0.8s'"
       />
     </div>

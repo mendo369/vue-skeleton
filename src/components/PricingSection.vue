@@ -116,7 +116,7 @@ const plans = [
           <!-- Bottom Action Link (Similar to "Read blog >") -->
           <div class="mt-auto">
             <router-link 
-              to="/pricing"
+              :to="'/configurar/' + plan.name.toLowerCase().replace(' ', '-')"
               class="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:gap-3 transition-all group/link"
             >
               {{ plan.buttonText }}
