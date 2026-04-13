@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import Typewriter from "./shared/Typewriter.vue";
 
-interface TeamMember {
+interface WorkArea {
   name: string;
   role: string;
   description: string;
@@ -12,7 +13,7 @@ interface TeamMember {
 }
 
 interface Props {
-  members: TeamMember[];
+  members: WorkArea[];
   typingSpeed?: number;
   sectionTitle?: string;
   sectionDescription?: string;
@@ -20,15 +21,26 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   typingSpeed: 50,
-  sectionTitle: "Un equipo construido\npara resultados reales",
+  sectionTitle: "Estructura diseñada\npara resultados",
   sectionDescription:
-    "Cada persona domina su área. Juntos cubren todo el ciclo: desde captar la atención hasta cerrar y retener al cliente.",
+    "Cada área trabaja de forma síncrona para cubrir todo el ciclo: desde captar la atención hasta cerrar y retener al cliente.",
 });
 
+const router = useRouter();
 const current = ref(0);
 
 function focus(idx: number) {
   current.value = idx;
+}
+
+function handleCardClick(idx: number) {
+  if (idx === current.value) {
+    if (props.members[idx].viewLink) {
+      router.push(props.members[idx].viewLink!);
+    }
+  } else {
+    focus(idx);
+  }
 }
 
 function next() {
@@ -49,25 +61,29 @@ function prev() {
 
     <div class="carousel">
       <div
-        v-for="(member, i) in members"
-        :key="member.name"
+        v-for="(area, i) in members"
+        :key="area.name"
         class="card bg-black"
         :class="{ active: i === current, side: i !== current }"
-        @click="focus(i)"
+        @click="handleCardClick(i)"
       >
         <div class="card-bg">
           <img
-            v-if="member.image"
-            :src="member.image"
-            :alt="member.name"
+            v-if="area.image"
+            :src="area.image"
+            :alt="area.name"
             class="card-img"
           />
-          <span v-else class="card-emoji">{{ member.emoji ?? "👤" }}</span>
+          <div v-else class="card-placeholder bg-zinc-900 w-full h-full flex items-center justify-center relative overflow-hidden">
+             <!-- Abstract background patterns for when there's no image -->
+             <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_#801586_0%,_transparent_70%)]"></div>
+             <span class="card-emoji relative z-10">{{ area.emoji ?? "🏗️" }}</span>
+          </div>
         </div>
 
         <div v-if="i === current" class="card-label">
           <Typewriter
-            :words="[member.role]"
+            :words="[area.role]"
             :typing-speed="typingSpeed"
             :delay="300"
             :loop="false"
@@ -84,13 +100,13 @@ function prev() {
             <p>{{ members[current].description }}</p>
           </div>
         </Transition>
-        <a
+        <router-link
           v-if="members[current].viewLink"
-          :href="members[current].viewLink"
+          :to="members[current].viewLink!"
           class="view-link"
         >
-          Ver perfil <span>›</span>
-        </a>
+          Explorar área <span>›</span>
+        </router-link>
       </div>
       <div class="nav-controls">
         <button @click="prev" class="nav-btn" aria-label="Anterior">‹</button>
@@ -104,7 +120,6 @@ function prev() {
 .team-section {
   padding: 80px 48px;
   background: #fff;
-  /* Evitamos que la sección entera cambie de tamaño */
   min-height: 800px;
 }
 
@@ -134,7 +149,7 @@ function prev() {
 .carousel {
   display: flex;
   gap: 16px;
-  height: 450px; /* Altura fija para el carrusel para evitar brincos */
+  height: 450px;
 }
 
 .card {
@@ -161,7 +176,6 @@ function prev() {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* background: #f8f8f8; */
   overflow: hidden;
 }
 
@@ -196,31 +210,7 @@ function prev() {
   font-weight: 800;
   line-height: 1.2;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-  /* Altura mínima para el Typewriter para que no colapse */
   min-height: 60px;
-}
-
-.play-btn {
-  position: absolute;
-  bottom: 25px;
-  right: 25px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
-}
-
-.play-btn:hover {
-  background: #801586;
-  border-color: #801586;
-  transform: scale(1.1);
 }
 
 .team-info {
@@ -235,7 +225,6 @@ function prev() {
   flex: 1;
 }
 
-/* TRANSICIÓN DE TEXTO */
 .fade-slide-up-enter-active,
 .fade-slide-up-leave-active {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -251,7 +240,6 @@ function prev() {
   transform: translateY(-10px);
 }
 
-/* ESTABILIZADOR DE LAYOUT */
 .info-content-stable {
   min-height: 100px;
 }
@@ -338,7 +326,6 @@ function prev() {
   .info-content-stable {
     min-height: 140px;
   }
-
   .card-label {
     font-size: 16px;
   }

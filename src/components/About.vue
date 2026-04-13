@@ -23,6 +23,32 @@ import {
 } from "lucide-vue-next";
 import IconDock from "./shared/IconDock.vue";
 import Typewriter from "./shared/Typewriter.vue";
+import { ref, onMounted, onUnmounted } from "vue";
+
+const isVisible = ref(false);
+const sectionRef = ref<HTMLElement | null>(null);
+
+let observer: IntersectionObserver | null = null;
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        isVisible.value = true;
+        if (sectionRef.value) observer?.unobserve(sectionRef.value);
+      }
+    },
+    { threshold: 0.2 }
+  );
+
+  if (sectionRef.value) {
+    observer.observe(sectionRef.value);
+  }
+});
+
+onUnmounted(() => {
+  if (observer) observer.disconnect();
+});
 
 // const dockItems = [
 //   { id: "back", icon: "←", label: "Atrás" },
@@ -70,7 +96,7 @@ const dockItems = [
 </script>
 
 <template>
-  <section class="flex flex-col justify-center items-center">
+  <section ref="sectionRef" class="flex flex-col justify-center items-center">
     <IconDock
       :items="dockItems"
       :item-size="100"
@@ -82,6 +108,7 @@ const dockItems = [
       class="text-2xl md:text-[3em] leading-tight text-center font-bold mb-8 mt-10 w-3/4 mx-auto"
     >
       <Typewriter
+        v-if="isVisible"
         :words="[
           'Simetrik transforma tu caos en un sistema que vende solo. \n Campañas + CRM + Automatización. Todo en uno. \n Deja de perseguir clientes. Empieza a cerrar ventas.',
         ]"
