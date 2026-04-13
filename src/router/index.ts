@@ -1,28 +1,23 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../views/Home.vue';
+import { createRouter, createWebHistory } from "vue-router";
+import Home from "../views/Home.vue";
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: "/",
+    name: "Home",
+    component: Home,
   },
   {
-    path: '/pricing',
-    name: 'Pricing',
-    component: () => import('../views/PricingView.vue')
+    path: "/pricing",
+    name: "Pricing",
+    component: () => import("../views/PricingView.vue"),
   },
   {
-    path: '/servicios/:slug',
-    name: 'ServiceDetail',
-    component: () => import('../views/ServiceDetailView.vue'),
-    props: true
+    path: "/servicios/:slug",
+    name: "ServiceDetail",
+    component: () => import("../views/ServiceDetailView.vue"),
+    props: true,
   },
-  {
-    path: '/auth',
-    name: 'Auth',
-    component: () => import('../views/Auth.vue')
-  }
 ];
 
 const router = createRouter({
@@ -34,7 +29,7 @@ const router = createRouter({
     } else {
       return { top: 0 };
     }
-  }
+  },
 });
 
 export default router;
