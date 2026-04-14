@@ -13,92 +13,151 @@ import {
   ArrowLeft,
   Plus,
   MousePointer2,
+  Settings,
+  Brain,
+  Briefcase,
+  Zap,
+  Info
 } from "lucide-vue-next";
 import Navbar from "../components/shared/Navbar.vue";
 
 const route = useRoute();
-const planSlug = computed(() => route.params.plan as string);
+const planSlug = computed(() => (route.params.plan as string) || "starter");
 
-const plans = {
-  starter: { name: "Starter", price: 25000 },
-  growth: { name: "Growth", price: 34900 },
-  "sales-machine": { name: "Sales Machine", price: 49900 },
+const plans: Record<string, any> = {
+  starter: {
+    name: "Starter",
+    price: 25000,
+    monthly: 2900,
+    includedIds: [],
+    description: "Sistema básico listo para operar.",
+  },
+  growth: {
+    name: "Growth",
+    price: 34900,
+    monthly: 2900,
+    includedIds: ["followup-30"],
+    description: "Ideal para escalar con seguimiento extendido.",
+  },
+  "sales-machine": {
+    name: "Sales Machine",
+    price: 49900,
+    monthly: 2900,
+    includedIds: ["crm-team", "bot-faq"],
+    description: "La solución total para equipos de alto rendimiento.",
+  },
 };
 
 const basePlan = computed(
-  () => plans[planSlug.value as keyof typeof plans] || plans.starter,
+  () => plans[planSlug.value] || plans.starter,
 );
 
-const addons = ref([
+const allAddons = [
+  // Setup Items (Upsells)
   {
-    id: 1,
-    name: "Bot de FAQ y objeciones",
-    description:
-      "Responde las preguntas más comunes automáticamente y filtra a los prospectos listos.",
-    icon: Bot,
-    category: "IA & Soporte",
-  },
-  {
-    id: 2,
-    name: "Calendario de agendamiento",
-    description:
-      "Tus prospectos agendan directamente sin llamadas de coordinación. El sistema lo gestiona solo.",
-    icon: Calendar,
-    category: "Ventas",
-  },
-  {
-    id: 3,
-    name: "Sistema de reseñas",
-    description:
-      "Solicita reseñas automáticamente a tus clientes satisfechos y construye reputación.",
-    icon: Star,
-    category: "Confianza",
-  },
-  {
-    id: 4,
-    name: "CRM para equipos",
-    description:
-      "Asignación de leads, scripts de venta, tablero de seguimiento y SLAs.",
-    icon: Users,
-    category: "Gestión",
-  },
-  {
-    id: 5,
-    name: "Winback y reactivación",
-    description:
-      "Secuencias automáticas para recuperar prospectos que no respondieron.",
-    icon: RotateCw,
-    category: "Recuperación",
-  },
-  {
-    id: 6,
-    name: "Tracking avanzado",
-    description:
-      "Eventos completos, CAPI y atribución real para medir conversión exacta.",
+    id: "tracking-pro",
+    name: "Tracking Pro",
+    description: "Eventos completos + CAPI para medición perfecta de anuncios.",
+    price: 4900,
+    type: "setup",
     icon: LineChart,
     category: "Datos",
   },
   {
-    id: 7,
-    name: "Landing page premium",
-    description:
-      "Tu página diseñada para convertir desde el primer día. Sin templates genéricos.",
-    icon: Layout,
-    category: "Diseño",
+    id: "followup-30",
+    name: "Follow-up Pro 30 días",
+    description: "No-show, winback y reactivación de leads antiguos.",
+    price: 6900,
+    type: "setup",
+    icon: RotateCw,
+    category: "Automatización",
   },
   {
-    id: 8,
-    name: "Campañas evergreen",
-    description:
-      "Anuncios que funcionan todo el año sin necesidad de contenido nuevo constante.",
+    id: "bot-faq",
+    name: "Bot FAQ + Objeciones",
+    description: "IA básica que resuelve dudas recurrentes 24/7.",
+    price: 8900,
+    type: "setup",
+    icon: Bot,
+    category: "IA",
+  },
+  {
+    id: "crm-team",
+    name: "CRM Team Pack",
+    description: "SLA, scripts, asignación, tareas y tablero de control.",
+    price: 12900,
+    type: "setup",
+    icon: Users,
+    category: "Equipo",
+  },
+  {
+    id: "reviews",
+    name: "Sistema de Reseñas",
+    description: "Automatización para captar testimonios reales en Google.",
+    price: 6900,
+    type: "setup",
+    icon: Star,
+    category: "Social Proof",
+  },
+  {
+    id: "evergreen",
+    name: "Campaña Evergreen",
+    description: "Estrategia de pauta de larga duración optimizada.",
+    price: 8900,
+    type: "setup",
     icon: Megaphone,
     category: "Ads",
   },
-]);
+  // Monthly Items (Add-ons)
+  {
+    id: "mantenimiento-plus",
+    name: "Mantenimiento Plus",
+    description: "2 ajustes técnicos al mes + revisión de métricas mensual.",
+    price: 2000,
+    type: "monthly",
+    icon: Settings,
+    category: "Servicio",
+  },
+  {
+    id: "bot-pro",
+    name: "Bot Pro Mensual",
+    description: "Mejora continua y optimización mensual del flujo de IA.",
+    price: 2500,
+    type: "monthly",
+    icon: Brain,
+    category: "IA",
+  },
+  {
+    id: "ads-full",
+    name: "Ads Full Management",
+    description: "Gestión completa de Meta/Google Ads (No incluye inversión).",
+    price: 12000,
+    type: "monthly",
+    icon: Layout,
+    category: "Ads",
+  },
+  {
+    id: "director-marketing",
+    name: "Director de Marketing",
+    description: "Estrategia integral + roadmap + juntas + métricas (Cupos limitados).",
+    price: 20000,
+    type: "monthly",
+    icon: Briefcase,
+    category: "Estratégico",
+  },
+];
 
 const selectedAddons = ref<any[]>([]);
 const draggedItem = ref<any>(null);
 const isHoveringPlan = ref(false);
+
+const addons = computed(() => {
+  return allAddons.filter(
+    (a) =>
+      !basePlan.value.includedIds.includes(a.id) &&
+      !selectedAddons.value.find((s) => s.id === a.id),
+  );
+});
 
 const onDragStart = (item: any) => {
   draggedItem.value = item;
@@ -107,7 +166,6 @@ const onDragStart = (item: any) => {
 const addAddon = (item: any) => {
   if (!selectedAddons.value.find((a) => a.id === item.id)) {
     selectedAddons.value.push(item);
-    addons.value = addons.value.filter((a) => a.id !== item.id);
   }
 };
 
@@ -121,8 +179,36 @@ const onDrop = () => {
 
 const removeAddon = (item: any) => {
   selectedAddons.value = selectedAddons.value.filter((a) => a.id !== item.id);
-  addons.value.push(item);
 };
+
+const setupSubtotal = computed(() => {
+  return (
+    basePlan.value.price +
+    selectedAddons.value
+      .filter((a) => a.type === "setup")
+      .reduce((sum, a) => sum + a.price, 0)
+  );
+});
+
+const discount = computed(() => {
+  // Descuento del 10% si se eligen 4 o más items adicionales (setup)
+  const setupItems = selectedAddons.value.filter((a) => a.type === "setup");
+  if (setupItems.length >= 4) {
+    return setupSubtotal.value * 0.1;
+  }
+  return 0;
+});
+
+const setupTotal = computed(() => setupSubtotal.value - discount.value);
+
+const monthlyTotal = computed(() => {
+  return (
+    basePlan.value.monthly +
+    selectedAddons.value
+      .filter((a) => a.type === "monthly")
+      .reduce((sum, a) => sum + a.price, 0)
+  );
+});
 
 onMounted(() => {
   window.scrollTo(0, 0);
@@ -255,26 +341,42 @@ onMounted(() => {
               >
                 <div>
                   <span
-                    class="text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-2 block"
+                    class="text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-1 block"
                     >Resumen del Sistema</span
                   >
                   <h2 class="text-4xl font-black">Plan {{ basePlan.name }}</h2>
+                  <p class="text-zinc-400 text-xs mt-1">Configuración personalizada</p>
                 </div>
-                <div class="text-right">
-                  <p class="text-[10px] font-bold text-zinc-400 uppercase mb-1">
-                    Inversión Final Est.
-                  </p>
-                  <p
-                    class="text-4xl font-bold font-mono tracking-tighter text-main-purple"
-                  >
-                    ${{
-                      (
-                        basePlan.price +
-                        selectedAddons.length * 5000
-                      ).toLocaleString()
-                    }}
-                    <span class="text-sm font-medium text-zinc-400">MXN</span>
-                  </p>
+                <div class="flex flex-col md:flex-row gap-8">
+                  <div class="text-left md:text-right">
+                    <p class="text-[10px] font-bold text-zinc-400 uppercase mb-1">
+                      Inversión Setup (Única)
+                    </p>
+                    <p class="text-3xl font-bold font-mono tracking-tighter text-zinc-900">
+                      ${{ setupTotal.toLocaleString() }}
+                      <span class="text-[10px] font-medium text-zinc-400">MXN</span>
+                    </p>
+                  </div>
+                  <div class="text-left md:text-right">
+                    <p class="text-[10px] font-bold text-zinc-400 uppercase mb-1">
+                      Mantenimiento (Mensual)
+                    </p>
+                    <p class="text-3xl font-bold font-mono tracking-tighter text-main-purple">
+                      ${{ monthlyTotal.toLocaleString() }}
+                      <span class="text-[10px] font-medium text-zinc-400">/mes</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Discount Banner -->
+              <div v-if="discount > 0" class="mb-8 p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div class="p-2 bg-green-500 rounded-lg">
+                  <Zap class="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p class="text-sm font-bold text-green-800">¡Descuento por Pack Aplicado!</p>
+                  <p class="text-xs text-green-600">Se ha aplicado un 10% de descuento por volumen en tu setup (-${{ discount.toLocaleString() }} MXN).</p>
                 </div>
               </div>
 
@@ -311,10 +413,14 @@ onMounted(() => {
                         <component :is="addon.icon" class="w-6 h-6" />
                       </div>
                       <div>
-                        <h4 class="font-bold text-zinc-900 mb-1">
+                        <h4 class="font-bold text-zinc-900 mb-0.5 text-sm">
                           {{ addon.name }}
                         </h4>
-                        <p class="text-xs text-zinc-500 leading-tight">
+                        <div class="flex items-center gap-2 mb-1">
+                          <span class="text-[10px] font-bold text-purple-600 uppercase">{{ addon.type === 'setup' ? 'Setup' : 'Mensual' }}</span>
+                          <span class="text-[10px] font-mono text-zinc-400">${{ addon.price.toLocaleString() }}</span>
+                        </div>
+                        <p class="text-[10px] text-zinc-500 leading-tight">
                           {{ addon.description }}
                         </p>
                       </div>
