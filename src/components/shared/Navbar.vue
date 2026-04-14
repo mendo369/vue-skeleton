@@ -188,11 +188,13 @@ onUnmounted(() => {
           </transition>
         </div>
 
-        <div
-          class="text-zinc-500 hover:text-black cursor-pointer transition-colors font-medium text-sm"
+        <router-link
+          to="/contacto"
+          @click="closeMenu"
+          class="text-zinc-500 hover:text-black transition-colors font-medium text-sm"
         >
           Contacto
-        </div>
+        </router-link>
       </div>
     </div>
 

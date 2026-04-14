@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import {
   Bot,
-  Calendar,
   Star,
   Users,
   RotateCw,
@@ -17,7 +16,6 @@ import {
   Brain,
   Briefcase,
   Zap,
-  Info
 } from "lucide-vue-next";
 import Navbar from "../components/shared/Navbar.vue";
 
@@ -48,9 +46,7 @@ const plans: Record<string, any> = {
   },
 };
 
-const basePlan = computed(
-  () => plans[planSlug.value] || plans.starter,
-);
+const basePlan = computed(() => plans[planSlug.value] || plans.starter);
 
 const allAddons = [
   // Setup Items (Upsells)
@@ -139,7 +135,8 @@ const allAddons = [
   {
     id: "director-marketing",
     name: "Director de Marketing",
-    description: "Estrategia integral + roadmap + juntas + métricas (Cupos limitados).",
+    description:
+      "Estrategia integral + roadmap + juntas + métricas (Cupos limitados).",
     price: 20000,
     type: "monthly",
     icon: Briefcase,
@@ -345,38 +342,60 @@ onMounted(() => {
                     >Resumen del Sistema</span
                   >
                   <h2 class="text-4xl font-black">Plan {{ basePlan.name }}</h2>
-                  <p class="text-zinc-400 text-xs mt-1">Configuración personalizada</p>
+                  <p class="text-zinc-400 text-xs mt-1">
+                    Configuración personalizada
+                  </p>
                 </div>
                 <div class="flex flex-col md:flex-row gap-8">
                   <div class="text-left md:text-right">
-                    <p class="text-[10px] font-bold text-zinc-400 uppercase mb-1">
+                    <p
+                      class="text-[10px] font-bold text-zinc-400 uppercase mb-1"
+                    >
                       Inversión Setup (Única)
                     </p>
-                    <p class="text-3xl font-bold font-mono tracking-tighter text-zinc-900">
+                    <p
+                      class="text-3xl font-bold font-mono tracking-tighter text-zinc-900"
+                    >
                       ${{ setupTotal.toLocaleString() }}
-                      <span class="text-[10px] font-medium text-zinc-400">MXN</span>
+                      <span class="text-[10px] font-medium text-zinc-400"
+                        >MXN</span
+                      >
                     </p>
                   </div>
                   <div class="text-left md:text-right">
-                    <p class="text-[10px] font-bold text-zinc-400 uppercase mb-1">
+                    <p
+                      class="text-[10px] font-bold text-zinc-400 uppercase mb-1"
+                    >
                       Mantenimiento (Mensual)
                     </p>
-                    <p class="text-3xl font-bold font-mono tracking-tighter text-main-purple">
+                    <p
+                      class="text-3xl font-bold font-mono tracking-tighter text-main-purple"
+                    >
                       ${{ monthlyTotal.toLocaleString() }}
-                      <span class="text-[10px] font-medium text-zinc-400">/mes</span>
+                      <span class="text-[10px] font-medium text-zinc-400"
+                        >/mes</span
+                      >
                     </p>
                   </div>
                 </div>
               </div>
 
               <!-- Discount Banner -->
-              <div v-if="discount > 0" class="mb-8 p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500">
+              <div
+                v-if="discount > 0"
+                class="mb-8 p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500"
+              >
                 <div class="p-2 bg-green-500 rounded-lg">
                   <Zap class="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <p class="text-sm font-bold text-green-800">¡Descuento por Pack Aplicado!</p>
-                  <p class="text-xs text-green-600">Se ha aplicado un 10% de descuento por volumen en tu setup (-${{ discount.toLocaleString() }} MXN).</p>
+                  <p class="text-sm font-bold text-green-800">
+                    ¡Descuento por Pack Aplicado!
+                  </p>
+                  <p class="text-xs text-green-600">
+                    Se ha aplicado un 10% de descuento por volumen en tu setup
+                    (-${{ discount.toLocaleString() }} MXN).
+                  </p>
                 </div>
               </div>
 
@@ -417,8 +436,15 @@ onMounted(() => {
                           {{ addon.name }}
                         </h4>
                         <div class="flex items-center gap-2 mb-1">
-                          <span class="text-[10px] font-bold text-purple-600 uppercase">{{ addon.type === 'setup' ? 'Setup' : 'Mensual' }}</span>
-                          <span class="text-[10px] font-mono text-zinc-400">${{ addon.price.toLocaleString() }}</span>
+                          <span
+                            class="text-[10px] font-bold text-purple-600 uppercase"
+                            >{{
+                              addon.type === "setup" ? "Setup" : "Mensual"
+                            }}</span
+                          >
+                          <span class="text-[10px] font-mono text-zinc-400"
+                            >${{ addon.price.toLocaleString() }}</span
+                          >
                         </div>
                         <p class="text-[10px] text-zinc-500 leading-tight">
                           {{ addon.description }}
