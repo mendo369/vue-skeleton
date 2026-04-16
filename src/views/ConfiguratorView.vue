@@ -14,7 +14,7 @@ import {
   MousePointer2,
   Settings,
   Brain,
-  Briefcase,
+  // Briefcase,
   Zap,
 } from "lucide-vue-next";
 import Navbar from "../components/shared/Navbar.vue";
