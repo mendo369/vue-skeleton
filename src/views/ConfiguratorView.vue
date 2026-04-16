@@ -132,16 +132,16 @@ const allAddons = [
     icon: Layout,
     category: "Ads",
   },
-  {
-    id: "director-marketing",
-    name: "Director de Marketing",
-    description:
-      "Estrategia integral + roadmap + juntas + métricas (Cupos limitados).",
-    price: 20000,
-    type: "monthly",
-    icon: Briefcase,
-    category: "Estratégico",
-  },
+  // {
+  //   id: "director-marketing",
+  //   name: "Director de Marketing",
+  //   description:
+  //     "Estrategia integral + roadmap + juntas + métricas (Cupos limitados).",
+  //   price: 20000,
+  //   type: "monthly",
+  //   icon: Briefcase,
+  //   category: "Estratégico",
+  // },
 ];
 
 const selectedAddons = ref<any[]>([]);
@@ -514,12 +514,27 @@ const goToBooking = () => {
                   </p>
                 </div>
 
-                <button
-                  @click="goToBooking"
-                  class="w-full md:w-auto px-10 py-5 bg-main-purple text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-zinc-900/10 hover:scale-[1.02] active:scale-95"
-                >
-                  Agendar Llamada de Estrategia
-                </button>
+                <div class="space-y-4">
+                  <button
+                    @click="goToBooking"
+                    class="w-full md:w-auto px-10 py-5 bg-main-purple text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-zinc-900/10 hover:scale-[1.02] active:scale-95"
+                  >
+                    Agendar Llamada de Estrategia
+                  </button>
+                  <p class="text-[10px] text-zinc-400 max-w-md leading-relaxed">
+                    En esta sesión técnica evaluaremos la configuración de tu
+                    <span class="font-bold text-zinc-900"
+                      >Plan {{ basePlan.name }}</span
+                    >
+                    con las
+                    <span class="font-bold text-zinc-900"
+                      >{{ selectedAddons.length }} capacidades adicionales</span
+                    >
+                    que has seleccionado. El objetivo es validar la viabilidad
+                    de este ecosistema para que logres vender con el orden y la
+                    automatización que tu empresa merece hoy.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
