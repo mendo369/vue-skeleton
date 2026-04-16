@@ -3,12 +3,7 @@
 <template>
   <footer class="footer flex flex-col items-center justify-center my-10">
     <div>
-      <h1 class="text-[5em]">
-        <span class="text-main-purple text-[2em]">S</span>imetri<span
-          class="text-main-purple text-[2em]"
-          >k</span
-        >
-      </h1>
+      <img src="/simetrik.png" alt="" class="w-32" />
     </div>
     <hr class="w-3/4" />
   </footer>

@@ -81,8 +81,8 @@ onUnmounted(() => {
         to="/"
         @click="closeMenu"
         class="text-xl font-black tracking-tighter"
-        >Simetrik</router-link
-      >
+        ><img src="/simetrik.png" alt="" class="w-14"
+      /></router-link>
 
       <!-- Desktop Links -->
       <div class="hidden md:flex gap-6 items-center">
