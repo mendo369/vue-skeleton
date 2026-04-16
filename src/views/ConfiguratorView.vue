@@ -210,6 +210,37 @@ const monthlyTotal = computed(() => {
 onMounted(() => {
   window.scrollTo(0, 0);
 });
+
+const goToBooking = () => {
+  // CONFIGURACIÓN DE GOHIGHLEVEL
+  // Reemplaza esta URL con tu link real de calendario de GHL
+  const GHL_CALENDAR_URL =
+    "https://api.leadconnectorhq.com/widget/booking/MqI8e5PSMohAg8V3vmby";
+
+  const params = new URLSearchParams();
+
+  // 1. Información del Plan Base
+  params.append("plan_seleccionado", basePlan.value.name);
+
+  // 2. Totales de Inversión
+  params.append("setup_total", setupTotal.value.toString());
+  params.append("mantenimiento_mensual", monthlyTotal.value.toString());
+
+  // 3. Upsells Seleccionados (Lista separada por comas)
+  const upsellsList = selectedAddons.value.map((a) => a.name).join(", ");
+
+  if (upsellsList) {
+    params.append("upsells_adicionales", upsellsList);
+  }
+
+  // 4. Información de Descuento (opcional)
+  if (discount.value > 0) {
+    params.append("descuento_aplicado", discount.value.toString());
+  }
+
+  // Redirigir a GHL con los parámetros
+  window.location.href = `${GHL_CALENDAR_URL}?${params.toString()}`;
+};
 </script>
 
 <template>
@@ -484,7 +515,8 @@ onMounted(() => {
                 </div>
 
                 <button
-                  class="w-full md:w-auto px-10 py-5 bg-main-purple text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-zinc-900/10"
+                  @click="goToBooking"
+                  class="w-full md:w-auto px-10 py-5 bg-main-purple text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-zinc-900/10 hover:scale-[1.02] active:scale-95"
                 >
                   Agendar Llamada de Estrategia
                 </button>
