@@ -2,157 +2,72 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import {
-  Bot,
-  Star,
-  Users,
-  RotateCw,
-  LineChart,
-  Layout,
-  Megaphone,
   ArrowLeft,
   Plus,
   MousePointer2,
-  Settings,
-  Brain,
-  // Briefcase,
   Zap,
+  Info,
 } from "lucide-vue-next";
 import Navbar from "../components/shared/Navbar.vue";
+import { useServicesStore } from "../stores/services";
 
 const route = useRoute();
+const servicesStore = useServicesStore();
 const planSlug = computed(() => (route.params.plan as string) || "starter");
 
-const plans: Record<string, any> = {
-  starter: {
-    name: "Starter",
-    price: 25000,
-    monthly: 2900,
-    includedIds: [],
-    description: "Sistema básico listo para operar.",
-  },
-  growth: {
-    name: "Growth",
-    price: 34900,
-    monthly: 2900,
-    includedIds: ["followup-30"],
-    description: "Ideal para escalar con seguimiento extendido.",
-  },
-  "sales-machine": {
-    name: "Sales Machine",
-    price: 49900,
-    monthly: 2900,
-    includedIds: ["crm-team", "bot-faq"],
-    description: "La solución total para equipos de alto rendimiento.",
-  },
-};
+const basePlan = computed(() => {
+  if (!servicesStore.data) return null;
+  return servicesStore.data.paquetes_implementacion.find(p => p.id === planSlug.value) || servicesStore.data.paquetes_implementacion[0];
+});
 
-const basePlan = computed(() => plans[planSlug.value] || plans.starter);
+const allAddons = computed(() => {
+  if (!servicesStore.data) return [];
+  
+  const setupItems = servicesStore.data.upsells_setup.map(m => ({
+    id: m.id,
+    name: m.nombre,
+    description: m.descripcion_corta,
+    tooltip: m.tooltip,
+    price: m.precio_setup,
+    type: "setup",
+    icon: servicesStore.getIcon(m.nombre),
+    category: "Módulo",
+    disponible_en: m.disponible_en
+  }));
 
-const allAddons = [
-  // Setup Items (Upsells)
-  {
-    id: "tracking-pro",
-    name: "Tracking Pro",
-    description: "Eventos completos + CAPI para medición perfecta de anuncios.",
-    price: 4900,
-    type: "setup",
-    icon: LineChart,
-    category: "Datos",
-  },
-  {
-    id: "followup-30",
-    name: "Follow-up Pro 30 días",
-    description: "No-show, winback y reactivación de leads antiguos.",
-    price: 6900,
-    type: "setup",
-    icon: RotateCw,
-    category: "Automatización",
-  },
-  {
-    id: "bot-faq",
-    name: "Bot FAQ + Objeciones",
-    description: "IA básica que resuelve dudas recurrentes 24/7.",
-    price: 8900,
-    type: "setup",
-    icon: Bot,
-    category: "IA",
-  },
-  {
-    id: "crm-team",
-    name: "CRM Team Pack",
-    description: "SLA, scripts, asignación, tareas y tablero de control.",
-    price: 12900,
-    type: "setup",
-    icon: Users,
-    category: "Equipo",
-  },
-  {
-    id: "reviews",
-    name: "Sistema de Reseñas",
-    description: "Automatización para captar testimonios reales en Google.",
-    price: 6900,
-    type: "setup",
-    icon: Star,
-    category: "Social Proof",
-  },
-  {
-    id: "evergreen",
-    name: "Campaña Evergreen",
-    description: "Estrategia de pauta de larga duración optimizada.",
-    price: 8900,
-    type: "setup",
-    icon: Megaphone,
-    category: "Ads",
-  },
-  // Monthly Items (Add-ons)
-  {
-    id: "mantenimiento-plus",
-    name: "Mantenimiento Plus",
-    description: "2 ajustes técnicos al mes + revisión de métricas mensual.",
-    price: 2000,
+  const monthlyItems = servicesStore.data.addons_mensuales.map(s => ({
+    id: s.id,
+    name: s.nombre,
+    description: s.descripcion,
+    tooltip: s.tooltip,
+    price: s.precio_mensual || 0,
     type: "monthly",
-    icon: Settings,
-    category: "Servicio",
-  },
-  {
-    id: "bot-pro",
-    name: "Bot Pro Mensual",
-    description: "Mejora continua y optimización mensual del flujo de IA.",
-    price: 2500,
-    type: "monthly",
-    icon: Brain,
-    category: "IA",
-  },
-  {
-    id: "ads-full",
-    name: "Ads Full Management",
-    description: "Gestión completa de Meta/Google Ads (No incluye inversión).",
-    price: 12000,
-    type: "monthly",
-    icon: Layout,
-    category: "Ads",
-  },
-  // {
-  //   id: "director-marketing",
-  //   name: "Director de Marketing",
-  //   description:
-  //     "Estrategia integral + roadmap + juntas + métricas (Cupos limitados).",
-  //   price: 20000,
-  //   type: "monthly",
-  //   icon: Briefcase,
-  //   category: "Estratégico",
-  // },
-];
+    icon: servicesStore.getIcon(s.nombre),
+    category: "Mensual",
+    disponible_en: undefined as string[] | undefined
+  }));
+
+  return [...setupItems, ...monthlyItems];
+});
 
 const selectedAddons = ref<any[]>([]);
 const draggedItem = ref<any>(null);
 const isHoveringPlan = ref(false);
 
 const addons = computed(() => {
-  return allAddons.filter(
-    (a) =>
-      !basePlan.value.includedIds.includes(a.id) &&
-      !selectedAddons.value.find((s) => s.id === a.id),
+  if (!basePlan.value) return [];
+  
+  return allAddons.value.filter(
+    (a) => {
+      // If it's a setup item, check if it's available for the current plan
+      if (a.type === 'setup' && a.disponible_en && basePlan.value && !a.disponible_en.includes(basePlan.value.id)) {
+        return false;
+      }
+
+      // Check if it's already in the selected list
+      const isSelected = selectedAddons.value.find((s) => s.id === a.id);
+      return !isSelected;
+    }
   );
 });
 
@@ -179,8 +94,9 @@ const removeAddon = (item: any) => {
 };
 
 const setupSubtotal = computed(() => {
+  if (!basePlan.value) return 0;
   return (
-    basePlan.value.price +
+    basePlan.value.precio_setup +
     selectedAddons.value
       .filter((a) => a.type === "setup")
       .reduce((sum, a) => sum + a.price, 0)
@@ -188,7 +104,6 @@ const setupSubtotal = computed(() => {
 });
 
 const discount = computed(() => {
-  // Descuento del 10% si se eligen 4 o más items adicionales (setup)
   const setupItems = selectedAddons.value.filter((a) => a.type === "setup");
   if (setupItems.length >= 4) {
     return setupSubtotal.value * 0.1;
@@ -199,46 +114,42 @@ const discount = computed(() => {
 const setupTotal = computed(() => setupSubtotal.value - discount.value);
 
 const monthlyTotal = computed(() => {
+  if (!servicesStore.data) return 0;
+  const baseMonthly = servicesStore.data.configuracion_base.cuota_mensual_mantenimiento;
   return (
-    basePlan.value.monthly +
+    baseMonthly +
     selectedAddons.value
       .filter((a) => a.type === "monthly")
       .reduce((sum, a) => sum + a.price, 0)
   );
 });
 
-onMounted(() => {
+onMounted(async () => {
   window.scrollTo(0, 0);
+  if (!servicesStore.data) {
+    await servicesStore.fetchServices();
+  }
 });
 
 const goToBooking = () => {
-  // CONFIGURACIÓN DE GOHIGHLEVEL
-  // Reemplaza esta URL con tu link real de calendario de GHL
   const GHL_CALENDAR_URL =
     "https://api.leadconnectorhq.com/widget/booking/MqI8e5PSMohAg8V3vmby";
 
   const params = new URLSearchParams();
 
-  // 1. Información del Plan Base
-  params.append("plan_seleccionado", basePlan.value.name);
-
-  // 2. Totales de Inversión
+  params.append("plan_seleccionado", basePlan.value?.nombre || "Starter");
   params.append("setup_total", setupTotal.value.toString());
   params.append("mantenimiento_mensual", monthlyTotal.value.toString());
 
-  // 3. Upsells Seleccionados (Lista separada por comas)
   const upsellsList = selectedAddons.value.map((a) => a.name).join(", ");
-
   if (upsellsList) {
     params.append("upsells_adicionales", upsellsList);
   }
 
-  // 4. Información de Descuento (opcional)
   if (discount.value > 0) {
     params.append("descuento_aplicado", discount.value.toString());
   }
 
-  // Redirigir a GHL con los parámetros
   window.location.href = `${GHL_CALENDAR_URL}?${params.toString()}`;
 };
 </script>
@@ -247,7 +158,7 @@ const goToBooking = () => {
   <div class="min-h-screen bg-white text-zinc-900 font-sans pb-20">
     <Navbar />
 
-    <main class="max-w-7xl mx-auto px-6 pt-24">
+    <main class="max-w-7xl mx-auto px-6 pt-24" v-if="servicesStore.data && basePlan">
       <!-- Header -->
       <div class="mb-12">
         <router-link
@@ -261,7 +172,7 @@ const goToBooking = () => {
         </router-link>
 
         <h1 class="text-4xl md:text-6xl font-black text-zinc-900 mb-4">
-          Configura tu Plan {{ basePlan.name }}
+          Configura tu Plan {{ basePlan.nombre }}
         </h1>
         <p class="text-zinc-500 text-lg max-w-2xl">
           Personaliza tu sistema arrastrando las capacidades adicionales que tu
@@ -292,6 +203,16 @@ const goToBooking = () => {
               @dragstart="onDragStart(addon)"
               class="group bg-white border border-zinc-100 p-5 rounded-2xl hover:border-purple-500/50 hover:shadow-xl hover:shadow-purple-500/5 transition-all cursor-grab active:cursor-grabbing relative overflow-hidden"
             >
+              <!-- Info Icon for Tooltip -->
+              <div class="absolute right-4 top-4 z-20 group/tooltip">
+                <Info :size="14" class="text-zinc-300 group-hover/tooltip:text-purple-500 transition-colors" />
+                <div class="absolute right-0 top-6 w-48 p-3 bg-zinc-900 text-white text-[10px] rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all shadow-xl z-50 pointer-events-none">
+                  {{ addon.tooltip }}
+                  <!-- Tooltip Arrow -->
+                  <div class="absolute -top-1 right-2 w-2 h-2 bg-zinc-900 rotate-45"></div>
+                </div>
+              </div>
+
               <!-- Icon and Title -->
               <div class="flex items-start gap-4 mb-3">
                 <div
@@ -303,7 +224,7 @@ const goToBooking = () => {
                   />
                 </div>
                 <div>
-                  <h3 class="font-bold text-sm text-zinc-900">
+                  <h3 class="font-bold text-sm text-zinc-900 pr-6">
                     {{ addon.name }}
                   </h3>
                   <span
@@ -316,9 +237,9 @@ const goToBooking = () => {
                 {{ addon.description }}
               </p>
 
-              <!-- Drag Indicator (Desktop Only) -->
+              <!-- Drag Indicator (Desktop Only - hidden when tooltip is active) -->
               <div
-                class="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block"
+                class="absolute right-4 bottom-4 opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block"
               >
                 <MousePointer2 class="w-4 h-4 text-purple-400 animate-bounce" />
               </div>
@@ -372,7 +293,7 @@ const goToBooking = () => {
                     class="text-[10px] font-bold uppercase tracking-widest text-purple-500 mb-1 block"
                     >Resumen del Sistema</span
                   >
-                  <h2 class="text-4xl font-black">Plan {{ basePlan.name }}</h2>
+                  <h2 class="text-4xl font-black">Plan {{ basePlan.nombre }}</h2>
                   <p class="text-zinc-400 text-xs mt-1">
                     Configuración personalizada
                   </p>
@@ -456,14 +377,24 @@ const goToBooking = () => {
                   <div
                     v-for="addon in selectedAddons"
                     :key="addon.id"
-                    class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm flex items-start justify-between group"
+                    class="bg-white p-6 rounded-3xl border border-zinc-100 shadow-sm flex items-start justify-between group relative"
                   >
+                    <!-- Info Icon for Tooltip -->
+                    <div class="absolute right-10 top-6 z-20 group/tooltip">
+                      <Info :size="12" class="text-zinc-300 group-hover/tooltip:text-purple-500 transition-colors" />
+                      <div class="absolute right-0 top-5 w-48 p-3 bg-zinc-900 text-white text-[10px] rounded-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all shadow-xl z-50 pointer-events-none">
+                        {{ addon.tooltip }}
+                        <!-- Tooltip Arrow -->
+                        <div class="absolute -top-1 right-2 w-2 h-2 bg-zinc-900 rotate-45"></div>
+                      </div>
+                    </div>
+                    
                     <div class="flex items-start gap-4">
                       <div class="p-3 rounded-2xl bg-purple-50 text-purple-600">
                         <component :is="addon.icon" class="w-6 h-6" />
                       </div>
                       <div>
-                        <h4 class="font-bold text-zinc-900 mb-0.5 text-sm">
+                        <h4 class="font-bold text-zinc-900 mb-0.5 text-sm pr-6">
                           {{ addon.name }}
                         </h4>
                         <div class="flex items-center gap-2 mb-1">
@@ -510,7 +441,7 @@ const goToBooking = () => {
                     <span class="font-bold text-zinc-900">{{
                       selectedAddons.length
                     }}</span>
-                    capacidades añadidas al núcleo de {{ basePlan.name }}.
+                    capacidades añadidas al núcleo de {{ basePlan.nombre }}.
                   </p>
                 </div>
 
@@ -521,10 +452,10 @@ const goToBooking = () => {
                   >
                     Agendar Llamada de Estrategia
                   </button>
-                  <p class="text-[10px] text-zinc-400 max-w-md leading-relaxed">
+                  <p class="text-[10px] text-zinc-400 max-w-md leading-relaxed" v-if="basePlan">
                     En esta sesión técnica evaluaremos la configuración de tu
                     <span class="font-bold text-zinc-900"
-                      >Plan {{ basePlan.name }}</span
+                      >Plan {{ basePlan.nombre }}</span
                     >
                     con las
                     <span class="font-bold text-zinc-900"
@@ -538,6 +469,18 @@ const goToBooking = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Loading state -->
+    <main v-else class="max-w-7xl mx-auto px-6 pt-48 text-center">
+      <div class="animate-pulse space-y-8">
+        <div class="h-12 bg-zinc-100 rounded-full w-48 mx-auto"></div>
+        <div class="h-24 bg-zinc-100 rounded-3xl w-full"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div class="lg:col-span-4 h-[600px] bg-zinc-50 rounded-3xl"></div>
+          <div class="lg:col-span-8 h-[600px] bg-zinc-50 rounded-[40px]"></div>
         </div>
       </div>
     </main>

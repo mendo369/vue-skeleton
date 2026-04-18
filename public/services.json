@@ -1,0 +1,178 @@
+{
+  "propuesta": {
+    "titulo": "Propuesta de Servicios — Ecosistema de Ventas Automatizado",
+    "tiempo_entrega": "7-10 días hábiles",
+    "garantia": "Si no está operativo en ese plazo, se devuelve el 100% de la implementación"
+  },
+  "configuracion_base": {
+    "cuota_mensual_mantenimiento": 3200,
+    "moneda": "MXN",
+    "detalles_mantenimiento": "desde mes 2, mes 1 de CRM incluido"
+  },
+  "paquetes_implementacion": [
+    {
+      "id": "starter",
+      "nombre": "Starter",
+      "precio_setup": 25000,
+      "destacado": false,
+      "descripcion": "Para negocios que quieren arrancar con lo esencial y escalar gradualmente.",
+      "servicios": [
+        {
+          "nombre": "Landing page",
+          "descripcion": "Página optimizada para conversión (móvil + escritorio)",
+          "tooltip": "Diseñada para que quien llegue tenga una razón clara para dejar sus datos."
+        },
+        {
+          "nombre": "Formulario de calificación",
+          "descripcion": "Quiz o formulario para filtrar prospectos",
+          "tooltip": "Hace preguntas clave para separar a los interesados serios de los que solo curiosean."
+        },
+        {
+          "nombre": "CRM Simetrika pp",
+          "descripcion": "Pipeline de ventas configurado",
+          "tooltip": "Un tablero donde ves todos tus prospectos y en qué etapa va cada uno."
+        },
+        {
+          "nombre": "Calendario de agendamiento",
+          "descripcion": "Los clientes agendan su cita solos",
+          "tooltip": "Conectado a tu disponibilidad. El prospecto elige su horario."
+        },
+        {
+          "nombre": "Seguimiento automático 7 días",
+          "descripcion": "Mensajes automáticos post-registro",
+          "tooltip": "Secuencia de mensajes que se envían solos durante 7 días."
+        },
+        {
+          "nombre": "Tracking base",
+          "descripcion": "Medición básica de tu página",
+          "tooltip": "Registra cuántas personas llegan a tu página y realizan acciones."
+        }
+      ]
+    },
+    {
+      "id": "growth",
+      "nombre": "Growth",
+      "precio_setup": 36900,
+      "destacado": true,
+      "descripcion": "Para negocios que no pueden darse el lujo de perder prospectos.",
+      "incluye_id": "starter",
+      "servicios_adicionales": [
+        {
+          "nombre": "Seguimiento 30 días",
+          "descripcion": "Seguimiento automatizado extendido",
+          "tooltip": "Incluye secuencias para quien no compró o quien no llegó a su cita."
+        },
+        {
+          "nombre": "No-show",
+          "descripcion": "Reagendamiento automático para inasistencias",
+          "tooltip": "Si alguien no se presentó a su cita, el sistema le escribe solo."
+        },
+        {
+          "nombre": "Winback",
+          "descripcion": "Reactivación de clientes anteriores",
+          "tooltip": "Campaña automática dirigida a personas inactivas."
+        },
+        {
+          "nombre": "Tracking Pro",
+          "descripcion": "Píxel de Facebook + conexión directa con CRM",
+          "tooltip": "Permite saber exactamente qué anuncio trajo a cada cliente que pagó."
+        }
+      ]
+    },
+    {
+      "id": "sales-machine",
+      "nombre": "Sales Machine",
+      "precio_setup": 54900,
+      "destacado": false,
+      "descripcion": "Para negocios con equipo de ventas que necesitan estructura completa.",
+      "incluye_id": "growth",
+      "servicios_adicionales": [
+        {
+          "nombre": "Asistente virtual (Bot FAQ)",
+          "descripcion": "Responde dudas y maneja objeciones 24/7",
+          "tooltip": "Bot entrenado con las preguntas frecuentes y objeciones comunes."
+        },
+        {
+          "nombre": "Handoff a humano",
+          "descripcion": "Transición automática del bot a un vendedor",
+          "tooltip": "Notifica a tu equipo cuando el prospecto está listo para cerrar."
+        },
+        {
+          "nombre": "CRM Team Pack",
+          "descripcion": "Gestión de equipo, plantillas y tableros de rendimiento",
+          "tooltip": "Configura quién atiende a quién y ve el rendimiento de cada vendedor."
+        },
+        {
+          "nombre": "Sistema de reseñas",
+          "descripcion": "Solicitud automática de reseñas post-servicio",
+          "tooltip": "Pide reseñas en el momento exacto de forma automática."
+        }
+      ]
+    }
+  ],
+  "upsells_setup": [
+    {
+      "id": "followup-30",
+      "nombre": "Seguimiento 30 días",
+      "precio_setup": 6900,
+      "descripcion_corta": "Seguimiento extendido para Starter",
+      "tooltip": "Agrega las secuencias de no-show, winback y reactivación al plan Starter.",
+      "disponible_en": ["starter"]
+    },
+    {
+      "id": "bot-faq",
+      "nombre": "Bot FAQ + Objeciones",
+      "precio_setup": 12500,
+      "descripcion_corta": "Asistente virtual básico",
+      "tooltip": "Bot entrenado con tus preguntas frecuentes y objeciones.",
+      "disponible_en": ["starter", "growth"]
+    },
+    {
+      "id": "crm-team-pack",
+      "nombre": "CRM Team Pack",
+      "precio_setup": 17900,
+      "descripcion_corta": "Gestión avanzada de equipo de ventas",
+      "tooltip": "Ideal cuando ya tienes más de un vendedor y necesitas orden.",
+      "disponible_en": ["starter", "growth"]
+    },
+    {
+      "id": "reviews-system",
+      "nombre": "Sistema de reseñas",
+      "precio_setup": 8900,
+      "descripcion_corta": "Automatización de testimonios",
+      "tooltip": "Se configura una vez y queda funcionando solo.",
+      "disponible_en": ["starter", "growth"]
+    }
+  ],
+  "addons_mensuales": [
+    {
+      "id": "mantenimiento-plus",
+      "nombre": "Mantenimiento Plus",
+      "precio_mensual": 2500,
+      "descripcion": "2 ajustes al mes + reporte mensual",
+      "tooltip": "Incluye modificaciones en flujos y reporte con propuestas de mejora."
+    },
+    {
+      "id": "bot-pro",
+      "nombre": "Bot Pro",
+      "precio_mensual": 2500,
+      "descripcion": "Optimización continua de IA",
+      "tooltip": "Se ajustan objeciones y se actualiza según cambios en tu oferta."
+    },
+    {
+      "id": "ads-management",
+      "nombre": "Gestión de anuncios",
+      "precio_mensual": 12000,
+      "descripcion": "Manejo completo de Meta/Google Ads",
+      "tooltip": "Incluye estrategia, optimización y reporte mensual (Inversión aparte)."
+    },
+    {
+      "id": "evergreen-campaign",
+      "nombre": "Campaña Evergreen",
+      "precio_setup": 10000,
+      "precio_mensual": 2500,
+      "descripcion": "Secuencia permanente de nutrición",
+      "tooltip": "Se configura una vez y trabaja sola todo el año."
+    }
+  ]
+}

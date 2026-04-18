@@ -1,58 +1,49 @@
 <script setup lang="ts">
+import { computed, onMounted } from "vue";
 import { Check, ArrowRight } from "lucide-vue-next";
+import { useServicesStore } from "../stores/services";
 
-const plans = [
-  {
-    name: "Starter",
-    description:
-      "Para negocios que quieren arrancar con lo esencial y escalar gradualmente.",
-    price: "25,000",
-    maintenance: "2,900",
-    features: [
-      "Landing page premium",
-      "CRM con pipeline organizado",
-      "Calendario de agendamiento",
-      "Automatización base (7 días)",
-      "Tracking base",
-      "Mes 1 de Simetrikapp incluido",
-    ],
-    buttonText: "Quiero el Starter",
-    isPopular: false,
-  },
-  {
-    name: "Growth",
-    description:
-      "Para negocios que no pueden darse el lujo de perder prospectos.",
-    price: "34,900",
-    maintenance: "2,900",
-    features: [
-      "Todo lo del plan Starter",
-      "Follow-up Pro 30 días",
-      "Secuencias de no-show",
-      "Winback y reactivación",
-      "Mes 1 de Simetrikapp incluido",
-    ],
-    buttonText: "Quiero el Growth",
-    isPopular: true,
-  },
-  {
-    name: "Sales Machine",
-    description:
-      "Para negocios con equipo de ventas que necesitan estructura completa.",
-    price: "49,900",
-    maintenance: "2,900",
-    features: [
-      "Todo lo del plan Starter",
-      "CRM Team Pack completo",
-      "Scripts y tablero de ventas",
-      "Bot FAQ y objeciones",
-      "Handoff automático al equipo",
-      "Mes 1 de Simetrikapp incluido",
-    ],
-    buttonText: "Quiero el Sales Machine",
-    isPopular: false,
-  },
-];
+const servicesStore = useServicesStore();
+
+const plans = computed(() => {
+  if (!servicesStore.data) return [];
+
+  return servicesStore.data.paquetes_implementacion.map(p => {
+    // Collect all services
+    let features: string[] = [];
+    
+    // Add base services if they exist
+    if (p.servicios) {
+      features = p.servicios.map(s => s.nombre);
+    }
+
+    // Handle inclusions from previous plans
+    if (p.incluye_id) {
+      const parentPlan = servicesStore.data?.paquetes_implementacion.find(pl => pl.id === p.incluye_id);
+      if (parentPlan) {
+        features = [`Todo lo del plan ${parentPlan.nombre}`, ...p.servicios_adicionales?.map(s => s.nombre) || []];
+      }
+    }
+
+    features.push("Mes 1 de CRM incluido");
+
+    return {
+      name: p.nombre,
+      description: p.descripcion,
+      price: p.precio_setup.toLocaleString(),
+      maintenance: servicesStore.data?.configuracion_base.cuota_mensual_mantenimiento.toLocaleString() || "3,200",
+      features: features,
+      buttonText: `Quiero el ${p.nombre}`,
+      isPopular: p.destacado,
+    };
+  });
+});
+
+onMounted(async () => {
+  if (!servicesStore.data) {
+    await servicesStore.fetchServices();
+  }
+});
 </script>
 
 <template>
@@ -82,7 +73,11 @@ const plans = [
       </div>
 
       <!-- Pricing Grid - Inspired by the Clean Card Style -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div v-if="servicesStore.loading" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div v-for="i in 3" :key="i" class="bg-zinc-50 rounded-2xl h-[500px] animate-pulse"></div>
+      </div>
+      
+      <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div v-for="plan in plans" :key="plan.name" class="flex flex-col group">
           <!-- Card Content -->
           <div class="bg-white rounded-2xl overflow-hidden mb-6 transition-all">
@@ -129,7 +124,7 @@ const plans = [
           <!-- Bottom Action Link (Similar to "Read blog >") -->
           <div class="mt-auto">
             <router-link
-              :to="'/configurar/' + plan.name.toLowerCase().replace(' ', '-')"
+              :to="'/configurar/' + plan.name.toLowerCase().replace(/\s+/g, '-')"
               class="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900 hover:gap-3 transition-all group/link"
             >
               {{ plan.buttonText }}
